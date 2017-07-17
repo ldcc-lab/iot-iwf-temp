@@ -27,7 +27,7 @@ public class TemperatureSensor {
 	private void check() throws Exception {
 		if (vDevice != null) {
 			while (true) {
-				Thread.sleep(2000);
+				Thread.sleep(10000);
 				if ((temp = sensor.getTemperature(2)) != null)
 					vDevice.putContent("temperature", "text/plain", "" + temp);
 				else
