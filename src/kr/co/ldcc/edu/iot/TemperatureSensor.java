@@ -27,11 +27,14 @@ public class TemperatureSensor {
 	private void check() throws Exception {
 		if (vDevice != null) {
 			while (true) {
-				Thread.sleep(10000);
 				if ((temp = sensor.getTemperature(2)) != null)
 					vDevice.putContent("temperature", "text/plain", "" + temp);
 				else
+				{
 					System.out.println(">> 페러티 체크 오류");
+					continue;
+				}
+				Thread.sleep(10000);
 			}
 		} else {
 			throw new Exception(">> 등록이 되어 있지 않음");
