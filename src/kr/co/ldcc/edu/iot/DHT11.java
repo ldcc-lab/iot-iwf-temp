@@ -1,9 +1,14 @@
 package kr.co.ldcc.edu.iot;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.GpioUtil;
 
 public class DHT11 {
+	private static final Logger LOG = LoggerFactory.getLogger(DHT11.class);
+
 	private static final int MAXTIMINGS = 85;
 	private final int[] dht11_dat = { 0, 0, 0, 0, 0 };
 
@@ -11,7 +16,8 @@ public class DHT11 {
 
 		// setup wiringPi
 		if (Gpio.wiringPiSetup() == -1) {
-			System.out.println(" ==>> GPIO SETUP FAILED");
+			LOG.error(" ==>> GPIO SETUP FAILED");
+			// System.out.println(" ==>> GPIO SETUP FAILED");
 			return;
 		}
 
@@ -26,7 +32,6 @@ public class DHT11 {
 		Gpio.pinMode(pin, Gpio.OUTPUT);
 		Gpio.digitalWrite(pin, Gpio.LOW);
 		Gpio.delay(18);
-
 		Gpio.digitalWrite(pin, Gpio.HIGH);
 		Gpio.pinMode(pin, Gpio.INPUT);
 
@@ -56,6 +61,7 @@ public class DHT11 {
 				j++;
 			}
 		}
+
 		// check we read 40 bits (8bit x 5 ) + verify checksum in the last byte
 		if (j >= 40 && checkParity()) {
 			float h = (float) ((dht11_dat[0] << 8) + dht11_dat[1]) / 10;
@@ -70,10 +76,12 @@ public class DHT11 {
 				c = -c;
 			}
 			final float f = c * 1.8f + 32;
-			System.out.println(">>>> Humidity = " + h + " Temperature = " + c + "˚C (" + f + "˚F)");
+			LOG.info(">>>> Humidity = " + h + " Temperature = " + c + "˚C (" + f + "˚F)");
+			// System.out.println(">>>> Humidity = " + h + " Temperature = " + c + "˚C (" + f + "˚F)");
 			return c;
 		} else {
-			System.out.println(">>>> Data not good, skip");
+			LOG.warn(">>>> Data not good, skip");
+			// System.out.println(">>>> Data not good, skip");
 			return null;
 		}
 
@@ -90,10 +98,10 @@ public class DHT11 {
 
 		for (int i = 0; i < 10; i++) {
 			Thread.sleep(2000);
-			dht.getTemperature(21);
+			dht.getTemperature(2);
 		}
-
-		System.out.println(">>>> Done!!");
+		LOG.info(">>>> Done!!");
+		// System.out.println(">>>> Done!!");
 
 	}
 }

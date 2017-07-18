@@ -1,5 +1,20 @@
 # iot-iwf-temp
 
-dht11 Sensor (MQTT)
+롯데 iot 교육용 온도 센서 예제
 
-T = 10s
+DHT11 Sensor (MQTT)
+
+    DHT => Digital Humidity Temperature)
+
+
+주기 T = 10s
+
+>DHT11
+>````
+>-Dlog4j.configuration=/home/pi/conf/logj4.xml
+>````
+
+>TemperatureSensor
+>````
+>-DhomePath=/home/pi/conf
+>````

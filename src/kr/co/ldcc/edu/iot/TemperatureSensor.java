@@ -2,17 +2,22 @@ package kr.co.ldcc.edu.iot;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import comus.wp.onem2m.iwf.common.M2MException;
 import comus.wp.onem2m.iwf.run.IWF;
 
 public class TemperatureSensor {
 
-	private String OID = "0002000100010001_85558625";
+	private static final Logger LOG = LoggerFactory.getLogger(TemperatureSensor.class);
 
 	private IWF vDevice;
-	private DHT11 sensor = new DHT11();
-
 	private Float temp;
+
+	private int pin = 2;
+	private String OID = "0002000100010001_85558625";
+	private DHT11 sensor = new DHT11();
 
 	private void register() throws Exception {
 		try {
@@ -27,11 +32,10 @@ public class TemperatureSensor {
 	private void check() throws Exception {
 		if (vDevice != null) {
 			while (true) {
-				if ((temp = sensor.getTemperature(2)) != null)
+				if ((temp = sensor.getTemperature(pin)) != null)
 					vDevice.putContent("temperature", "text/plain", "" + temp);
-				else
-				{
-					System.out.println(">> 페러티 체크 오류");
+				else {
+					LOG.warn(">> 패리티 체크 오류 발생");
 					continue;
 				}
 				Thread.sleep(10000);
