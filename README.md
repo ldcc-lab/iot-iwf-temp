@@ -4,7 +4,7 @@
 
 DHT11 Sensor (MQTT)
 
-    DHT => Digital Humidity Temperature)
+    DHT => Digital Humidity Temperature
 
 
 주기 T = 10s
