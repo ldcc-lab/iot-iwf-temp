@@ -1,6 +1,8 @@
 package kr.co.ldcc.edu.iot;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,41 +11,51 @@ import comus.wp.onem2m.iwf.common.M2MException;
 import comus.wp.onem2m.iwf.run.IWF;
 
 public class TemperatureSensor {
-
 	private static final Logger LOG = LoggerFactory.getLogger(TemperatureSensor.class);
 
-	private IWF vDevice;
-	private Float temp;
+	
+	Runtime rt = Runtime.getRuntime();
+	  Process p = null;
 
-	private int pin = 2;
-	private String OID = "0002000100010001_85558625";
-	private DHT11 sensor = new DHT11();
+	  private IWF vDevice;
+	  private String temperature;
+	  private String OID = "0001000100010001_sample";                                                 // 디바이스 식별체계
 
-	private void register() throws Exception {
-		try {
-			vDevice = new IWF(OID);
-		} catch (IOException | M2MException e) {
-			e.printStackTrace();
-			throw new Exception(">> 선언 실패");
-		}
-		vDevice.register();
-	}
+	  private void register() {
+	    //
+	    try {
+	      vDevice = new IWF(OID);                                                   // 1. 환경설정 (OID, conf, log)
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+	    vDevice.register();                                                         // 2. IWF 등록
+	  }
 
-	private void check() throws Exception {
-		if (vDevice != null) {
-			while (true) {
-				if ((temp = sensor.getTemperature(pin)) != null)
-					vDevice.putContent("temperature", "text/plain", "" + temp);
-				else {
-					LOG.warn(">> 패리티 체크 오류 발생");
-					continue;
-				}
-				Thread.sleep(10000);
-			}
-		} else {
-			throw new Exception(">> 등록이 되어 있지 않음");
-		}
-	}
+	  private void check() throws InterruptedException {
+	    //
+	    if (vDevice != null) {
+	      while (true) {
+	        try {
+	          p = rt.exec("python /home/pi/py/dht11_example.py");
+	          BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+	          temperature = br.readLine();
+	        } catch (Exception e) {
+	        	e.printStackTrace();
+	        }
+	        if (temperature != null && !"".equals(temperature)) {
+	          vDevice.putContent("temperature", "text/plain", "" + temperature);     // 센서 데이터 업로드
+	        } else {
+	          System.out.print(".");
+	          continue;
+	        }
+	        System.out.println();
+	        Thread.sleep(10000);
+	      }
+	    } else {
+	      System.out.println("등록을 먼저 해주세요.");
+	    }
+	  }
+
 
 	public static void main(String[] args) throws Exception {
 
